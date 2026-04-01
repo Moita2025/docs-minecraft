@@ -1,0 +1,45 @@
+site_name: Moita's Minecraft Docs
+site_url: https://moita2025.github.io/docs-minecraft
+theme:
+    name: material
+    custom_dir: docs/overrides
+    features:
+        - content.code.copy
+        - navigation.path
+        - navigation.prune
+        - navigation.tabs
+        - navigation.indexes
+        - navigation.top
+        - toc.follow
+    palette:
+        primary: teal
+
+markdown_extensions:
+    - pymdownx.arithmatex:
+        generic: true
+    - attr_list
+    - md_in_html
+    - pymdownx.emoji:
+        emoji_index: !!python/name:material.extensions.emoji.twemoji
+        emoji_generator: !!python/name:material.extensions.emoji.to_svg
+    - pymdownx.highlight:
+        anchor_linenums: true
+        line_spans: __span
+        pygments_lang_class: true
+    - pymdownx.inlinehilite 
+    - pymdownx.tilde
+    - pymdownx.snippets
+    - pymdownx.superfences:
+        custom_fences:
+            - name: mermaid
+              class: mermaid
+              format: !!python/name:pymdownx.superfences.fence_code_format
+    - admonition
+    - pymdownx.details
+    - pymdownx.tabbed:
+        alternate_style: true
+    - footnotes
+
+plugins:
+    - search
+    - monorepo
