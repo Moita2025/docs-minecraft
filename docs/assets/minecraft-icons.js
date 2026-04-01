@@ -30,7 +30,7 @@ const getMCHRIcon = async function(oriImg, jsonRelPath, item){
 }
 
 const removeSpecialIconPrefix = function(str){
-    const prefixDict = Utils.minecraft.specialIconPrefixDict;
+    const prefixDict = specialIconPrefixDict;
 
     for (const prefix in prefixDict) {
         if (Object.prototype.hasOwnProperty.call(prefixDict, prefix)) {
@@ -48,16 +48,16 @@ const removeSpecialIconPrefix = function(str){
 
 const isRightItem = function(config, iconName){
     // 遍历特殊前缀字典，检查 iconName 是否以某个前缀开头
-    for (let prefix in Utils.minecraft.specialIconPrefixDict) {
+    for (let prefix in specialIconPrefixDict) {
         if (iconName.startsWith(prefix)) {
-            const modName = Utils.minecraft.specialIconPrefixDict[prefix];
+            const modName = specialIconPrefixDict[prefix];
             // 如果是特殊前缀物品，要求：
             // 1. 中文名匹配
             // 2. path 中包含对应的模组文件夹名
             if (config.path.includes(modName)) 
             {
                 return (config.keys && config.keys.includes(
-                    Utils.minecraft.removeSpecialIconPrefix(iconName)
+                    removeSpecialIconPrefix(iconName)
                 ));
             }
         }
@@ -82,7 +82,7 @@ const getMCIconDict = async function(iconNameList){
 
     for (const iconName of uniqueIconNames) {
         for (const config of all_configs) {
-            if (Utils.minecraft.isRightItem(config, iconName)) {
+            if (isRightItem(config, iconName)) {
                 const finalPath = `${url_prefix}${config.path}`;
                 pathsToFetch.add(finalPath);
                 iconToPathMap[iconName] = finalPath;
@@ -130,7 +130,7 @@ const getMCIconDict = async function(iconNameList){
     for (const [iconName, path] of Object.entries(iconToPathMap)) {
         for (const item of allJsonData) {
             if (item.chineseName && item.srcName) {
-                if (item.chineseName === Utils.minecraft.removeSpecialIconPrefix(iconName) && 
+                if (item.chineseName === removeSpecialIconPrefix(iconName) && 
                     item.path == path) {
 
                     let parts = path.split('/');
@@ -138,7 +138,7 @@ const getMCIconDict = async function(iconNameList){
                     let jsonRelPath = parts.join('/') + '/';
 
                     var imgFinalPath = `${jsonRelPath}img/${item.srcName}`
-                    imgFinalPath = await Utils.minecraft.getMCHRIcon(imgFinalPath, jsonRelPath, item);
+                    imgFinalPath = await getMCHRIcon(imgFinalPath, jsonRelPath, item);
 
                     iconToImageUrlMap[iconName] = imgFinalPath;
                     break;
