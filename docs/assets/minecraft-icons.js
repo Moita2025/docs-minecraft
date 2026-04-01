@@ -1,12 +1,10 @@
-window.Utils.minecraft = window.Utils.minecraft || {};
-
-Utils.minecraft.specialIconPrefixDict = {
+const specialIconPrefixDict = {
     "vmw-": "vics-modern-warfare",
     "tw-": "twilight-forest",
     "bop-": "biomes-o-plenty"
 };
 
-Utils.minecraft.getMCHRIcon = async function(oriImg, jsonRelPath, item){
+const getMCHRIcon = async function(oriImg, jsonRelPath, item){
 
     if (jsonRelPath.includes("www-mcmod-cn") && item.srcName == "9339.png")
     {
@@ -31,7 +29,7 @@ Utils.minecraft.getMCHRIcon = async function(oriImg, jsonRelPath, item){
     return `${jsonRelPath}img/${item.srcName}`;
 }
 
-Utils.minecraft.removeSpecialIconPrefix = function(str){
+const removeSpecialIconPrefix = function(str){
     const prefixDict = Utils.minecraft.specialIconPrefixDict;
 
     for (const prefix in prefixDict) {
@@ -48,7 +46,7 @@ Utils.minecraft.removeSpecialIconPrefix = function(str){
     return str;
 }
 
-Utils.minecraft.isRightItem = function(config, iconName){
+const isRightItem = function(config, iconName){
     // 遍历特殊前缀字典，检查 iconName 是否以某个前缀开头
     for (let prefix in Utils.minecraft.specialIconPrefixDict) {
         if (iconName.startsWith(prefix)) {
@@ -69,7 +67,7 @@ Utils.minecraft.isRightItem = function(config, iconName){
     return (config.keys && config.keys.includes(iconName));
 }
 
-Utils.minecraft.getMCIconDict = async function(nodesOriData){
+const getMCIconDict = async function(iconNameList){
     const url_prefix = "https://moita2025.github.io/assets-minecraft/"
 
     const response = await fetch(`${url_prefix}all_configs.json`);
@@ -77,7 +75,7 @@ Utils.minecraft.getMCIconDict = async function(nodesOriData){
 
     if (!all_configs) return;
 
-    const uniqueIconNames = [...new Set(nodesOriData.map(node => node.iconName))];
+    const uniqueIconNames = [...new Set(iconNameList)];
     // - iconToPathMap: 图标名称到JSON文件路径的映射
     var iconToPathMap = {};
     const pathsToFetch = new Set();
