@@ -11,7 +11,13 @@
 
 ## 方块合成表
 
+=== "原料"
 
+    <table id="recipe-table-input" class="recipe-table"></table>
+
+=== "产物"
+
+    <table id="recipe-table-output" class="recipe-table"></table>
 
 <script>
 
