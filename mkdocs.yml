@@ -39,7 +39,15 @@ markdown_extensions:
     - pymdownx.tabbed:
         alternate_style: true
     - footnotes
+    - toc:
+        permalink: true
+        slugify: !!python/name:pymdownx.slugs.uslugify
 
 plugins:
     - search
     - monorepo
+
+nav:
+    - 首页: index.md
+    - 原版:
+        - 原版 id & 配方: vanilla/id-and-recipe.md
