@@ -5,15 +5,21 @@
 
     该页面只包含 1.21.11 及其以前的游戏版本的相关数据
 
-<table id="ID-Table"></table>
+## 方块 名称 & id
+
+<table id="id-table"></table>
+
+## 方块合成表
+
+
 
 <script>
 
-    const url_prefix = 'https://moita2025.github.io/assets-minecraft/1.21.11/';
-    const json_url = url_prefix + 'config.json';
-    const img_prefix = url_prefix + 'img/';
+    const id_prefix = 'https://moita2025.github.io/assets-minecraft/1.21.11/';
+    const config_url = id_prefix + 'config.json';
+    const img_prefix = id_prefix + 'img/';
 
-    fetch(json_url)
+    fetch(config_url)
         .then(response => response.json())  // 将响应解析为 JSON
         .then(data => {
             const tableData = data.map(item => {
@@ -36,7 +42,7 @@
 
             // 将数据渲染到 DataTable
             createDataTable(
-                'ID-Table',                 // tableId
+                'id-table',                 // tableId
                 ['图标', '名称', '版本', 'ID 版本', '英文 ID'],  // columns
                 tableData,                       // data
                 {
