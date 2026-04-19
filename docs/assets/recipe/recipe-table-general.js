@@ -65,19 +65,32 @@ async function renderRecipeTable(tableId, recipes, isOutputTable = true) {
     }
 
     let columns = ['原料', '产物', '配方'];
-    let data = [];
 
-    data = recipes.map(recipe => ({
-        '原料': Array.isArray(recipe.input_items) ? recipe.input_items.join('、') : '',
-        '产物': recipe.output_item || '',
-        '配方': renderRecipeUI(recipe)   // 可根据实际字段调整
-    }));
+    const data = await Promise.all(
+        recipes.map(async (recipe) => {
+            const rawMaterials = Array.isArray(recipe.input_items) 
+                ? recipe.input_items.join('、') 
+                : '';
+
+            const product = recipe.output_item || '';
+
+            // 必须 await，否则配方列仍是 Promise 对象
+            const recipeHTML = await renderRecipeUI(recipe);
+
+            // 返回数组，顺序必须和 columns 完全一致！
+            return [
+                rawMaterials,   // 第1列：原料
+                product,        // 第2列：产物
+                recipeHTML      // 第3列：配方（HTML）
+            ];
+        })
+    );
 
     createDataTable(
         tableId,           // tableId
         columns,           // columns
         data,              // data
-        {}                 // options（可后续扩展）
+        {pageLength: 5}                 // options（可后续扩展）
     );
 }
 

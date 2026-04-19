@@ -97,12 +97,7 @@ const getMCIconDict = async function(iconNameList){
 
     for (const path of uniquePaths) {
         try {
-            const response = await MCAssetCache.fetchWithCache(path);
-            if (!response.ok) {
-                console.error(`Failed to fetch ${path}: ${response.statusText}`);
-                continue;
-            }
-            const jsonData = await response.json();
+            const jsonData = await MCAssetCache.fetchWithCache(path);
             //allJsonData.push(...jsonData); // 合并数组
 
             if (Array.isArray(jsonData)) {
