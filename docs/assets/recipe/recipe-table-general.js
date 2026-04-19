@@ -58,3 +58,49 @@ async function getRecipeData(
     }
 }
 
+async function renderRecipeTable(tableId, recipes, isOutputTable = true) {
+    if (!recipes || recipes.length === 0) {
+        console.log(`没有数据需要渲染到表格: ${tableId}`);
+        return;
+    }
+
+    let columns = ['原料', '产物', '配方'];
+    let data = [];
+
+    data = recipes.map(recipe => ({
+        '原料': Array.isArray(recipe.input_items) ? recipe.input_items.join('、') : '',
+        '产物': recipe.output_item || '',
+        '配方': renderRecipeUI(recipe)   // 可根据实际字段调整
+    }));
+
+    createDataTable(
+        tableId,           // tableId
+        columns,           // columns
+        data,              // data
+        {}                 // options（可后续扩展）
+    );
+}
+
+async function renderAllRecipes(chnName) {
+    const recipeData = await getRecipeData(chnName);
+
+    if (!recipeData) {
+        console.warn(`无法获取 "${chnName}" 的合成表数据`);
+        return;
+    }
+
+    // 渲染输出表（以该物品为产物的配方）
+    if (recipeData.output && recipeData.output.length > 0) {
+        await renderRecipeTable('recipe-table-output', recipeData.output, true);
+    } else {
+        console.log(`物品 "${chnName}" 没有作为产物的合成表`);
+    }
+
+    // 渲染输入表（以该物品为原料的配方）
+    if (recipeData.input && recipeData.input.length > 0) {
+        await renderRecipeTable('recipe-table-input', recipeData.input, false);
+    } else {
+        console.log(`物品 "${chnName}" 没有作为原料的合成表`);
+    }
+}
+

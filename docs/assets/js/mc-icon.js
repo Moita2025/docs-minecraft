@@ -71,7 +71,7 @@ const getMCIconDict = async function(iconNameList){
     const url_prefix = "https://moita2025.github.io/assets-minecraft/"
 
     const response = await MCAssetCache.fetchWithCache(`${url_prefix}all_configs.json`);
-    const all_configs = await response.json();
+    const all_configs = await response;
 
     if (!all_configs) return;
 

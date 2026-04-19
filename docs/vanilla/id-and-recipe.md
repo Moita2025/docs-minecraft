@@ -64,4 +64,6 @@
             );
         })
         .catch(error => console.error('Error fetching the JSON file:', error));
+
+    renderAllRecipes("金合欢木板");
 </script>
