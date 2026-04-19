@@ -16,14 +16,14 @@ const getMCHRIcon = async function(oriImg, jsonRelPath, item){
     }
     else if (jsonRelPath.includes("1.21.11"))
     {   
-        const dimensions = item.sizes;
+        /*const dimensions = item.sizes;
 
         if (dimensions)
         {
             if (dimensions[0] < 73 && dimensions[1] < 73){
                 return `${jsonRelPath}img/${item.srcName}`.replace(".png", "-256px.png");
             }
-        }
+        }*/
     }
 
     return `${jsonRelPath}img/${item.srcName}`;
