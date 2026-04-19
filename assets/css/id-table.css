@@ -1,0 +1,46 @@
+#id-table td, #id-table th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+#id-table img {
+    object-fit: contain; /* 保持图像的比例 */
+    image-rendering: pixelated;  /* 使用像素化模式，避免模糊 */
+}
+
+#id-table td:first-child {
+    width: 90px;
+    height: 90px;
+    text-align: center;
+}
+
+#id-table td:nth-child(5) {
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 200px;
+    min-width: 75px;
+}
+
+@media only screen and (max-width: 768px) {
+    #id-table td:first-child {
+        width: 65px;
+        height: 65px;
+    }
+
+    #id-table td:first-child img {
+        width: 60px;
+        height: 60px;
+    }
+
+    #id-table td:nth-child(2) {
+        min-width: 65px;
+    }
+
+    #id-table td:nth-child(5) {
+        max-width: 100px;
+    }
+
+    .hidden-on-mobile {
+        display: none;
+    }
+}
