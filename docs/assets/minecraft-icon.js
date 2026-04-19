@@ -70,7 +70,7 @@ const isRightItem = function(config, iconName){
 const getMCIconDict = async function(iconNameList){
     const url_prefix = "https://moita2025.github.io/assets-minecraft/"
 
-    const response = await fetch(`${url_prefix}all_configs.json`);
+    const response = await MCAssetCache.fetchWithCache(`${url_prefix}all_configs.json`);
     const all_configs = await response.json();
 
     if (!all_configs) return;
@@ -97,7 +97,7 @@ const getMCIconDict = async function(iconNameList){
 
     for (const path of uniquePaths) {
         try {
-            const response = await fetch(path);
+            const response = await MCAssetCache.fetchWithCache(path);
             if (!response.ok) {
                 console.error(`Failed to fetch ${path}: ${response.statusText}`);
                 continue;

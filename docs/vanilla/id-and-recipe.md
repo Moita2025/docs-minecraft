@@ -25,8 +25,8 @@
     const config_url = id_prefix + 'config.json';
     const img_prefix = id_prefix + 'img/';
 
-    fetch(config_url)
-        .then(response => response.json())  // 将响应解析为 JSON
+    MCAssetCache.fetchWithCache(config_url)
+        // .then(response => response.json())  // 将响应解析为 JSON
         .then(data => {
             const tableData = data.map(item => {
                 // 将中文名称和英文名称合并成一个格子，使用 <br> 换行
@@ -64,5 +64,3 @@
         })
         .catch(error => console.error('Error fetching the JSON file:', error));
 </script>
-
-<script src="/docs-minecraft/assets/minecraft-icon.js"></script>
