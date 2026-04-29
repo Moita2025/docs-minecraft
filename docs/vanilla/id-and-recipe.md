@@ -24,6 +24,7 @@
     const id_prefix = 'https://moita2025.github.io/assets-minecraft/1.21.11/';
     const config_url = id_prefix + 'config.json';
     const recipe_url = id_prefix + 'recipes.json';
+    const tag_url = id_prefix + 'tags.json';
     const img_prefix = id_prefix + 'img/';
 
     MCAssetCache.fetchWithCache(config_url)

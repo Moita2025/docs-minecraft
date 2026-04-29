@@ -1,6 +1,48 @@
+function normalizeTagNameList(tagValue) {
+    if (Array.isArray(tagValue)) {
+        return tagValue.filter(Boolean);
+    }
+    if (typeof tagValue === 'string') {
+        return [tagValue];
+    }
+    return [];
+}
+
+function getTagListByChineseName(chnName, tagNameMap) {
+    if (!chnName || !tagNameMap || typeof tagNameMap !== 'object') {
+        return [];
+    }
+
+    const relatedTags = [];
+    for (const [tagKey, tagValue] of Object.entries(tagNameMap)) {
+        const names = normalizeTagNameList(tagValue);
+        if (names.includes(chnName)) {
+            relatedTags.push(tagKey);
+        }
+    }
+    return relatedTags;
+}
+
+function getDisplayNameByTag(tagValue, fallbackTag) {
+    const names = normalizeTagNameList(tagValue);
+    return names.length > 0 ? names[0] : fallbackTag;
+}
+
+function getRecipeRawMaterials(recipe, tagNameMap) {
+    const inputItems = Array.isArray(recipe.input_items) ? recipe.input_items : [];
+    const inputTags = Array.isArray(recipe.input_tags) ? recipe.input_tags : [];
+
+    const tagDisplayNames = inputTags.map(tag => {
+        return getDisplayNameByTag(tagNameMap ? tagNameMap[tag] : undefined, tag);
+    });
+
+    return [...inputItems, ...tagDisplayNames];
+}
+
 async function getRecipeData(
         chnName,
-        recipe_url = 'https://moita2025.github.io/assets-minecraft/1.21.11/recipes.json'
+        recipe_url = 'https://moita2025.github.io/assets-minecraft/1.21.11/recipes.json',
+        tag_url = 'https://moita2025.github.io/assets-minecraft/1.21.11/tags.json'
     ) {
 
     if (!chnName || typeof chnName !== 'string') {
@@ -11,11 +53,14 @@ async function getRecipeData(
     try {
         const response = await MCAssetCache.fetchWithCache(recipe_url);
         const allRecipes = await response;
+        const tagNameMap = await MCAssetCache.fetchWithCache(tag_url);
 
         if (!Array.isArray(allRecipes)) {
             console.error('recipes.json 数据格式错误，应为数组');
             return null;
         }
+
+        const tagsOfCurrentName = getTagListByChineseName(chnName, tagNameMap);
 
         const relatedRecipes = allRecipes.filter(recipe => {
             // 检查是否是输出物品
@@ -25,6 +70,11 @@ async function getRecipeData(
             if (Array.isArray(recipe.input_items) && 
                 recipe.input_items.includes(chnName)) {
                 return true;
+            }
+
+            // hasTag 表示该配方原料中包含 tag 项：按 input_tags 参与检索
+            if (recipe.hasTag && Array.isArray(recipe.input_tags) && tagsOfCurrentName.length > 0) {
+                return recipe.input_tags.some(tag => tagsOfCurrentName.includes(tag));
             }
 
             return false;
@@ -49,7 +99,8 @@ async function getRecipeData(
 
         return {
             input: inputRecipes,   // 以 chnName 为输入材料的合成表
-            output: outputRecipes  // 以 chnName 为输出产物的合成表
+            output: outputRecipes, // 以 chnName 为输出产物的合成表
+            tagNameMap: tagNameMap
         };
 
     } catch (error) {
@@ -58,7 +109,7 @@ async function getRecipeData(
     }
 }
 
-async function renderRecipeTable(tableId, recipes, isOutputTable = true) {
+async function renderRecipeTable(tableId, recipes, isOutputTable = true, tagNameMap = {}) {
     if (!recipes || recipes.length === 0) {
         console.log(`没有数据需要渲染到表格: ${tableId}`);
         return;
@@ -68,9 +119,7 @@ async function renderRecipeTable(tableId, recipes, isOutputTable = true) {
 
     const data = await Promise.all(
         recipes.map(async (recipe) => {
-            const rawMaterials = Array.isArray(recipe.input_items) 
-                ? recipe.input_items.join('、') 
-                : '';
+            const rawMaterials = getRecipeRawMaterials(recipe, tagNameMap).join('、');
 
             const product = recipe.output_item || '';
 
@@ -95,7 +144,11 @@ async function renderRecipeTable(tableId, recipes, isOutputTable = true) {
 }
 
 async function renderAllRecipes(chnName) {
-    const recipeData = await getRecipeData(chnName);
+    const recipeData = await getRecipeData(
+        chnName,
+        (typeof recipe_url !== 'undefined' ? recipe_url : undefined),
+        (typeof tag_url !== 'undefined' ? tag_url : undefined)
+    );
 
     if (!recipeData) {
         console.warn(`无法获取 "${chnName}" 的合成表数据`);
@@ -104,14 +157,14 @@ async function renderAllRecipes(chnName) {
 
     // 渲染输出表（以该物品为产物的配方）
     if (recipeData.output && recipeData.output.length > 0) {
-        await renderRecipeTable('recipe-table-output', recipeData.output, true);
+        await renderRecipeTable('recipe-table-output', recipeData.output, true, recipeData.tagNameMap);
     } else {
         console.log(`物品 "${chnName}" 没有作为产物的合成表`);
     }
 
     // 渲染输入表（以该物品为原料的配方）
     if (recipeData.input && recipeData.input.length > 0) {
-        await renderRecipeTable('recipe-table-input', recipeData.input, false);
+        await renderRecipeTable('recipe-table-input', recipeData.input, false, recipeData.tagNameMap);
     } else {
         console.log(`物品 "${chnName}" 没有作为原料的合成表`);
     }
