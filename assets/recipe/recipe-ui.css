@@ -1,0 +1,241 @@
+/* #region 通用 */
+
+.mcui {
+    display: inline-block;
+    position: relative;
+    background-color: #C6C6C6;
+    border: 2px solid;
+    border-color: #DBDBDB #5B5B5B #5B5B5B #DBDBDB;
+    padding: 6px;
+    text-align: left;
+    white-space: nowrap;
+    vertical-align: bottom;
+}
+
+.mcwiki-header-grass, .ns-special .gallerybox img, .ns-14 .gallerybox img, .filehistory a img, .pixel-image, .invslot-item-image, .msgbox img, .spriteedit-new-image, .sprite {
+    image-rendering: optimizeSpeed;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: optimize-contrast;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -o-crisp-edges;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+    -ms-interpolation-mode: nearest-neighbor;
+}
+
+/* #endregion */
+/* #region invslot */
+
+.invslot {
+    position: relative;
+    display: inline-block;
+    background: #8B8B8B no-repeat center center / 32px 32px;
+    border: 2px solid;
+    border-color: #373737 #FFF #FFF #373737;
+    box-sizing: content-box;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    line-height: 1;
+    text-align: left;
+    vertical-align: bottom;
+}
+
+.invslot-item, .invslot-item a:first-child {
+    position: relative;
+    display: block;
+    margin: -2px;
+    padding: 2px;
+    width: 32px;
+    height: 32px;
+}
+
+.invslot-stacksize {
+    font-family: Minecraft,"Arial Black",sans-serif !important;
+}
+
+.invslot-stacksize {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    font-family: Minecraft,Unifont,Courier,sans-serif;
+    font-weight: normal !important;
+    color: #FFF !important;
+    text-shadow: 2px 2px 0 #3F3F3F;
+    filter: dropshadow(color=#3F3F3F,offx=2,offy=2);
+    z-index: 2;
+}
+
+.invslot-large {
+    padding: 8px;
+}
+
+.invslot::before, .invslot::after {
+    content: "";
+    position: absolute;
+    background-color: #8B8B8B;
+    height: 2px;
+    width: 2px;
+    pointer-events: none;
+}
+
+.invslot::before {
+    bottom: -2px;
+    left: -2px;
+}
+
+.invslot::after {
+    top: -2px;
+    right: -2px;
+}
+
+/* #endregion */
+/* #region 工作台 */
+
+.mcui-Crafting_Table > *, .mcui-Furnace > * {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.mcui-Crafting_Table > .mcui-arrow {
+    background: url(./img-general/Grid_layout_Arrow_%28small%29.png) no-repeat;
+    width: 32px;
+    height: 26px;
+    margin: 40px 4px 0;
+}
+
+.mcui-Crafting_Table > .mcui-output {
+    margin-top: 28px;
+}
+
+.mcui-Crafting_Table .mcui-row {
+    display: block;
+}
+
+.mcui-Inventory-Crafting_Table-arrow {
+    background-image: url(./img-general/Grid_layout_Furnace_Progress_%28in-active%29.png);
+}
+
+/* #endregion */
+/* #region 熔炉 */
+
+.mcui-Furnace > .mcui-arrow {
+    background: url(./img-general/Grid_layout_Furnace_Progress.png) no-repeat;
+    width: 44px;
+    height: 32px;
+    margin: 36px 18px 0 14px;
+}
+
+.mcui-Furnace > .mcui-output {
+    margin-top: 28px;
+}
+
+.mcui-Furnace .mcui-fuel {
+    display: block;
+    background: url(./img-general/Grid_layout_Fire.png) no-repeat;
+    width: 36px;
+    height: 36px;
+}
+
+/* #endregion */
+/* #region 炼药台 */
+
+.mcui-Brewing_Stand > .mcui-input {
+    text-align: center;
+}
+
+.mcui-Brewing_Stand > * {
+    display: block;
+}
+
+.mcui-Brewing_Stand > .mcui-paths {
+    position: relative;
+    background: url(./img-general/Grid_layout_Brewing_Paths.png) no-repeat;
+    width: 60px;
+    height: 40px;
+    margin: -20px auto -16px;
+    z-index: 1;
+}
+
+.mcui-Brewing_Stand .mcui-bubbling, .mcui-Inventory-Brewing_Stand-bubbles {
+    background-image: url(./img-general/Grid_layout_Brewing_Bubbles.gif);
+}
+
+.mcui-Brewing_Stand .mcui-bubbling, .mcui-Brewing_Stand .mcui-arrow {
+    display: inline-block;
+    background-repeat: no-repeat;
+    width: 24px;
+    height: 57px;
+}
+
+.mcui-Brewing_Stand .invslot {
+    vertical-align: top;
+}
+
+.mcui-Brewing_Stand > .mcui-input > .invslot {
+    margin-top: 3px;
+}
+
+.mcui-Brewing_Stand .mcui-arrow, .mcui-Inventory-Brewing_Stand-arrow {
+    background-image: url(./img-general/Grid_layout_Brewing_Arrow.png);
+}
+
+.mcui-Brewing_Stand .mcui-output2 {
+    margin: 14px 10px 0;
+}
+
+/* #endregion */
+/* #region 锻造台 */
+
+.template-Smithing_Table-background {
+    width: 232px;
+    height: 132px;
+}
+
+.template-Smithing_Table-prompt {
+    display: block;
+    color: #3F3F3F;
+    font-family: Minecraft,"Arial Black",Unifont,"WenQuanYi Bitmap Song",SimSun,MingLiU,"GB18030 Bitmap",Beijing,sans-serif;
+    font-size: 16px;
+    text-align: left;
+    margin-left: 74px;
+    margin-top: 24px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 2px;
+}
+
+.template-Smithing_Table-slots {
+    display: block;
+    position: absolute;
+    top: 86px;
+    left: 6px;
+}
+
+.template-Smithing_Table-hammer {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background-size: cover;
+    width: 60px;
+    height: 62px;
+}
+
+.mcui-Smithing_Table > .mcui-hammer, .mcui-Inventory-Smithing_Table-hammer {
+    background-image: url(./img-general/Smithing_Table_Hammer_JE2.png);
+}
+
+.template-Smithing_Table-arrow {
+    position: absolute;
+    top: 90px;
+    left: 138px;
+    width: 44px;
+    height: 30px;
+}
+
+.mcui-Smithing_Table > .mcui-arrow, .mcui-Anvil > .mcui-arrow, .mcui-Inventory-Anvil-arrow {
+    background-image: url(./img-general/Grid_layout_Furnace_Progress_%28in-active%29.png);
+    background-position-y: -2px;
+}
+
+/* #endregion */
