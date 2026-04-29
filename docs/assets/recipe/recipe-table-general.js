@@ -147,11 +147,15 @@ async function renderRecipeTable(tableId, recipes, isOutputTable = true, tagName
         console.log(`没有数据需要渲染到表格: ${tableId}`);
         return;
     }
+    
+    const sortedRecipes = (typeof sortRecipesForBed === 'function')
+        ? sortRecipesForBed(recipes)
+        : recipes;
 
     let columns = ['原料', '产物', '配方'];
 
     const data = await Promise.all(
-        recipes.map(async (recipe) => {
+        sortedRecipes.map(async (recipe) => {
             const rawMaterials = getRecipeRawMaterials(recipe, tagNameMap, currentName, currentTags).join('、');
 
             const product = recipe.output_item || '';
