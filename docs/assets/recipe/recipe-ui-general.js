@@ -3,7 +3,49 @@
  * @param {Object} recipe - 单条配方数据
  * @returns {string} HTML字符串（Minecraft风格的 crafting UI）
  */
-async function renderRecipeUI(recipe) {
+function uiNormalizeTagNameList(tagValue) {
+    if (Array.isArray(tagValue)) return tagValue.filter(Boolean);
+    if (typeof tagValue === "string") return [tagValue];
+    return [];
+}
+
+function uiNormalizeTagKey(tag) {
+    if (typeof tag !== "string") return "";
+    return tag.startsWith("#") ? tag.slice(1) : tag;
+}
+
+function uiGetTagMappedNames(tag, tagNameMap) {
+    if (!tagNameMap || typeof tagNameMap !== "object") return [];
+    const candidates = [tag, `#${uiNormalizeTagKey(tag)}`, uiNormalizeTagKey(tag)];
+    for (const key of candidates) {
+        if (Object.prototype.hasOwnProperty.call(tagNameMap, key)) {
+            const names = uiNormalizeTagNameList(tagNameMap[key]);
+            if (names.length > 0) return names;
+        }
+    }
+    return [];
+}
+
+function uiResolveMaterialName(rawName, recipe, recipeContext) {
+    if (!rawName) return rawName;
+    const tagNameMap = recipeContext?.tagNameMap || {};
+    const currentName = recipeContext?.currentName || "";
+    const currentTags = Array.isArray(recipeContext?.currentTags) ? recipeContext.currentTags : [];
+    const inputTags = Array.isArray(recipe?.input_tags) ? recipe.input_tags : [];
+
+    const mappedNames = uiGetTagMappedNames(rawName, tagNameMap);
+    const isTagLike = mappedNames.length > 0 || inputTags.includes(rawName);
+    if (!isTagLike) return rawName;
+
+    const normalizedCurrentTagSet = new Set(currentTags.map(uiNormalizeTagKey));
+    if (normalizedCurrentTagSet.has(uiNormalizeTagKey(rawName)) && currentName) {
+        return currentName;
+    }
+
+    return mappedNames.length > 0 ? mappedNames[0] : rawName;
+}
+
+async function renderRecipeUI(recipe, recipeContext = {}) {
     if (!recipe || !recipe.type) {
         return '<span style="color:#888;">未知配方</span>';
     }
@@ -12,7 +54,7 @@ async function renderRecipeUI(recipe) {
         switch (recipe.type) {
             case "minecraft:crafting_shaped":
             case "minecraft:crafting_shapeless":    
-                return await renderRecipeCraftingTable(recipe);
+                return await renderRecipeCraftingTable(recipe, recipeContext);
 
             default:
                 return `<span style="color:#f66;">暂不支持的配方类型: ${recipe.type}</span>`;
@@ -23,7 +65,7 @@ async function renderRecipeUI(recipe) {
     }
 }
 
-async function renderRecipeCraftingTable(recipe) {
+async function renderRecipeCraftingTable(recipe, recipeContext = {}) {
     const inputItems = recipe.input_items || [];
     const location = recipe.location || [];
     const outputItem = recipe.output_item || "未知";
@@ -32,7 +74,8 @@ async function renderRecipeCraftingTable(recipe) {
     // location 是9个元素的数组，对应3x3网格（从左到右、从上到下）
     const grid = [];
     for (let i = 0; i < 9; i++) {
-        const itemName = location[i] && location[i] !== "null" ? location[i] : null;
+        const rawName = location[i] && location[i] !== "null" ? location[i] : null;
+        const itemName = rawName ? uiResolveMaterialName(rawName, recipe, recipeContext) : null;
         grid.push(itemName);
     }
 

@@ -8,6 +8,24 @@ function normalizeTagNameList(tagValue) {
     return [];
 }
 
+function normalizeTagKey(tag) {
+    if (typeof tag !== 'string') return '';
+    return tag.startsWith('#') ? tag.slice(1) : tag;
+}
+
+function getTagMappedNames(tag, tagNameMap) {
+    if (!tagNameMap || typeof tagNameMap !== 'object') return [];
+    const candidates = [tag, `#${normalizeTagKey(tag)}`, normalizeTagKey(tag)];
+
+    for (const key of candidates) {
+        if (Object.prototype.hasOwnProperty.call(tagNameMap, key)) {
+            const names = normalizeTagNameList(tagNameMap[key]);
+            if (names.length > 0) return names;
+        }
+    }
+    return [];
+}
+
 function getTagListByChineseName(chnName, tagNameMap) {
     if (!chnName || !tagNameMap || typeof tagNameMap !== 'object') {
         return [];
@@ -28,12 +46,25 @@ function getDisplayNameByTag(tagValue, fallbackTag) {
     return names.length > 0 ? names[0] : fallbackTag;
 }
 
-function getRecipeRawMaterials(recipe, tagNameMap) {
+function getDisplayNameByTagKey(tag, tagNameMap, currentName, currentTags) {
+    const normalizedCurrentTags = Array.isArray(currentTags)
+        ? currentTags.map(normalizeTagKey)
+        : [];
+
+    if (normalizedCurrentTags.includes(normalizeTagKey(tag))) {
+        return currentName;
+    }
+
+    const names = getTagMappedNames(tag, tagNameMap);
+    return names.length > 0 ? names[0] : tag;
+}
+
+function getRecipeRawMaterials(recipe, tagNameMap, currentName, currentTags) {
     const inputItems = Array.isArray(recipe.input_items) ? recipe.input_items : [];
     const inputTags = Array.isArray(recipe.input_tags) ? recipe.input_tags : [];
 
     const tagDisplayNames = inputTags.map(tag => {
-        return getDisplayNameByTag(tagNameMap ? tagNameMap[tag] : undefined, tag);
+        return getDisplayNameByTagKey(tag, tagNameMap, currentName, currentTags);
     });
 
     return [...inputItems, ...tagDisplayNames];
@@ -74,7 +105,8 @@ async function getRecipeData(
 
             // hasTag 表示该配方原料中包含 tag 项：按 input_tags 参与检索
             if (recipe.hasTag && Array.isArray(recipe.input_tags) && tagsOfCurrentName.length > 0) {
-                return recipe.input_tags.some(tag => tagsOfCurrentName.includes(tag));
+                const currentTagSet = new Set(tagsOfCurrentName.map(normalizeTagKey));
+                return recipe.input_tags.some(tag => currentTagSet.has(normalizeTagKey(tag)));
             }
 
             return false;
@@ -100,7 +132,8 @@ async function getRecipeData(
         return {
             input: inputRecipes,   // 以 chnName 为输入材料的合成表
             output: outputRecipes, // 以 chnName 为输出产物的合成表
-            tagNameMap: tagNameMap
+            tagNameMap: tagNameMap,
+            currentTags: tagsOfCurrentName
         };
 
     } catch (error) {
@@ -109,7 +142,7 @@ async function getRecipeData(
     }
 }
 
-async function renderRecipeTable(tableId, recipes, isOutputTable = true, tagNameMap = {}) {
+async function renderRecipeTable(tableId, recipes, isOutputTable = true, tagNameMap = {}, currentName = '', currentTags = []) {
     if (!recipes || recipes.length === 0) {
         console.log(`没有数据需要渲染到表格: ${tableId}`);
         return;
@@ -119,12 +152,16 @@ async function renderRecipeTable(tableId, recipes, isOutputTable = true, tagName
 
     const data = await Promise.all(
         recipes.map(async (recipe) => {
-            const rawMaterials = getRecipeRawMaterials(recipe, tagNameMap).join('、');
+            const rawMaterials = getRecipeRawMaterials(recipe, tagNameMap, currentName, currentTags).join('、');
 
             const product = recipe.output_item || '';
 
             // 必须 await，否则配方列仍是 Promise 对象
-            const recipeHTML = await renderRecipeUI(recipe);
+            const recipeHTML = await renderRecipeUI(recipe, {
+                tagNameMap: tagNameMap,
+                currentName: currentName,
+                currentTags: currentTags
+            });
 
             // 返回数组，顺序必须和 columns 完全一致！
             return [
@@ -157,14 +194,28 @@ async function renderAllRecipes(chnName) {
 
     // 渲染输出表（以该物品为产物的配方）
     if (recipeData.output && recipeData.output.length > 0) {
-        await renderRecipeTable('recipe-table-output', recipeData.output, true, recipeData.tagNameMap);
+        await renderRecipeTable(
+            'recipe-table-output',
+            recipeData.output,
+            true,
+            recipeData.tagNameMap,
+            chnName,
+            recipeData.currentTags
+        );
     } else {
         console.log(`物品 "${chnName}" 没有作为产物的合成表`);
     }
 
     // 渲染输入表（以该物品为原料的配方）
     if (recipeData.input && recipeData.input.length > 0) {
-        await renderRecipeTable('recipe-table-input', recipeData.input, false, recipeData.tagNameMap);
+        await renderRecipeTable(
+            'recipe-table-input',
+            recipeData.input,
+            false,
+            recipeData.tagNameMap,
+            chnName,
+            recipeData.currentTags
+        );
     } else {
         console.log(`物品 "${chnName}" 没有作为原料的合成表`);
     }
